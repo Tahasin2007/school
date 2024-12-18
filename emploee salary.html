@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Salary Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"], input[type="number"] {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        #employeeTable {
+            display: none;
+        }
+
+        #updateSalarySection {
+            display: none;
+        }
+
+        #currentSalaries {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Employee Salary Management</h1>
+
+    <div id="employeeForm">
+        <div class="form-group">
+            <label for="employeeCount">Enter the number of employees:</label>
+            <input type="number" id="employeeCount" min="1" placeholder="Number of employees">
+        </div>
+        <button onclick="createEmployees()">Submit</button>
+    </div>
+
+    <div id="employeeTable">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+            <tbody id="employeeRows">
+            </tbody>
+        </table>
+        <button onclick="enableUpdateSection()">Update Salaries</button>
+        <button onclick="viewCurrentSalaries()">See Current Salaries</button>
+    </div>
+
+    <div id="updateSalarySection">
+        <div class="form-group">
+            <label for="percentage">Enter percentage to update salaries:</label>
+            <input type="number" id="percentage" placeholder="Percentage increase/decrease">
+        </div>
+        <button onclick="updateSalaries()">Apply Percentage</button>
+    </div>
+
+    <div id="currentSalaries">
+        <h2>Current Salaries</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+            <tbody id="currentSalaryRows">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let employees = [];
+
+        function createEmployees() {
+            const count = parseInt(document.getElementById('employeeCount').value);
+            if (isNaN(count) || count <= 0) {
+                alert('Please enter a valid number of employees.');
+                return;
+            }
+
+            employees = [];
+            const employeeRows = document.getElementById('employeeRows');
+            employeeRows.innerHTML = '';
+
+            for (let i = 0; i < count; i++) {
+                employees.push({
+                    id: i + 1,
+                    name: `Employee_${i + 1}`,
+                    salary: 0
+                });
+
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${employees[i].id}</td>
+                    <td><input type="text" placeholder="Name" onchange="updateEmployeeName(${i}, this.value)"></td>
+                    <td><input type="number" placeholder="Salary" onchange="updateEmployeeSalary(${i}, this.value)"></td>
+                `;
+
+                employeeRows.appendChild(row);
+            }
+
+            document.getElementById('employeeTable').style.display = 'block';
+        }
+
+        function updateEmployeeName(index, name) {
+            employees[index].name = name;
+        }
+
+        function updateEmployeeSalary(index, salary) {
+            employees[index].salary = parseFloat(salary) || 0;
+        }
+
+        function enableUpdateSection() {
+            document.getElementById('updateSalarySection').style.display = 'block';
+        }
+
+        function updateSalaries() {
+            const percentage = parseFloat(document.getElementById('percentage').value);
+            if (isNaN(percentage)) {
+                alert('Please enter a valid percentage.');
+                return;
+            }
+
+            employees.forEach(employee => {
+                employee.salary += employee.salary * (percentage / 100);
+                if (employee.salary < 0) employee.salary = 0;
+            });
+
+            displayEmployees();
+        }
+
+        function displayEmployees() {
+            const employeeRows = document.getElementById('employeeRows');
+            employeeRows.innerHTML = '';
+
+            employees.forEach(employee => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${employee.id}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.salary.toFixed(2)}</td>
+                `;
+
+                employeeRows.appendChild(row);
+            });
+        }
+
+        function viewCurrentSalaries() {
+            const currentSalaryRows = document.getElementById('currentSalaryRows');
+            currentSalaryRows.innerHTML = '';
+
+            employees.forEach(employee => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${employee.id}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.salary.toFixed(2)}</td>
+                `;
+
+                currentSalaryRows.appendChild(row);
+            });
+
+            document.getElementById('currentSalaries').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
